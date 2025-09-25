@@ -1,5 +1,5 @@
 model:
-  name: "qwen-local" 
+  name: "unsloth/Qwen3-8B-unsloth-bnb-4bit" 
   max_seq_length: 4096
   dtype: null
   load_in_4bit: true
@@ -46,7 +46,7 @@ training:
   seed: 42
 
 dataset:
-  path: "comprehensive_dataset.jsonl"
+  path: "devops-42k/devops-42k.jsonl"
   format: "jsonl"
   conversation_format: "chatml"
   max_length: 4096
