@@ -1,6 +1,6 @@
 # Unsloth Fine-tuning Pipeline
 
-A production-ready pipeline for fine-tuning large language models using Unsloth with YAML-based configuration and advanced training features.
+A production-ready pipeline for fine-tuning large language models using Unsloth with YAML-based configuration, advanced training features, and web-based model serving.
 
 ## Overview
 
@@ -13,6 +13,7 @@ This pipeline provides a streamlined approach to fine-tuning language models wit
 - ChatML conversation format support
 - Graceful interruption handling
 - Built-in model testing capabilities
+- **Web-based model serving with Gradio interface**
 
 ## Tested Configuration
 
@@ -20,6 +21,7 @@ This pipeline provides a streamlined approach to fine-tuning language models wit
 - **Hardware**: 12GB RTX 5070 GPU
 - **Dataset Format**: ChatML (tested and validated)
 - **Training**: Successfully completed with provided configuration
+- **Serving**: Gradio web interface for interactive model testing
 
 ## Installation
 
@@ -37,10 +39,12 @@ pip install -r requirements.txt
 pip install unsloth[colab-new] @ git+https://github.com/unslothai/unsloth.git
 pip install torch torchvision torchaudio
 pip install transformers datasets trl peft accelerate bitsandbytes
-pip install PyYAML
+pip install PyYAML gradio
 ```
 
 ## Quick Start
+
+### Training
 
 1. **Prepare your dataset** in ChatML format (JSONL file)
 2. **Configure training parameters** in `config.yaml`
@@ -49,6 +53,16 @@ pip install PyYAML
 ```bash
 python finetune.py --config config.yaml
 ```
+
+### Model Serving
+
+After training, serve your model with a web interface:
+
+```bash
+python launch_model.py
+```
+
+This will start a Gradio interface at `http://localhost:7860` where you can interact with your fine-tuned model.
 
 ### Dataset Format
 
@@ -250,6 +264,46 @@ output:
 - `save_method`: Model saving format ("merged_16bit", "merged_4bit", "lora")
 - `test_prompts`: List of prompts for post-training validation
 
+## Model Serving with Gradio
+
+### Launching the Web Interface
+
+After training your model, you can serve it with an interactive web interface:
+
+```bash
+python launch_model.py
+```
+
+### Features
+
+- **Interactive Chat Interface**: Real-time conversation with your fine-tuned model
+- **Kubernetes Expertise**: Pre-configured for Kubernetes-related queries
+- **Example Prompts**: Built-in examples to get started quickly
+- **Responsive Design**: Works on desktop and mobile devices
+- **Shareable Interface**: Option to create public links for sharing
+
+### Customization
+
+To use the serving script with your own model, update the model path in `launch_model.py`:
+
+```python
+model, tokenizer = FastLanguageModel.from_pretrained(
+    model_name="path/to/your/trained/model",  # Update this path
+    max_seq_length=4096,
+    dtype=None,
+    load_in_4bit=True,
+)
+```
+
+### Configuration Options
+
+The Gradio interface supports several configuration options:
+
+- **Temperature**: Controls response randomness (0.1-1.0)
+- **Max Tokens**: Maximum response length
+- **Repetition Penalty**: Prevents repetitive responses
+- **System Prompt**: Customizable system instructions
+
 ## Advanced Features
 
 ### Smart Early Stopping
@@ -281,6 +335,8 @@ Model saved to ./output-directory
 
 ## Command Line Options
 
+### Training
+
 ```bash
 python finetune.py --config config.yaml [OPTIONS]
 ```
@@ -289,6 +345,14 @@ python finetune.py --config config.yaml [OPTIONS]
 - `--config, -c`: Path to YAML configuration file (required)
 - `--output-dir, -o`: Override output directory from config
 - `--dry-run`: Validate configuration without starting training
+
+### Model Serving
+
+```bash
+python launch_model.py
+```
+
+The script will automatically start the Gradio interface on `http://localhost:7860`.
 
 ## Hardware Requirements
 
@@ -301,6 +365,11 @@ python finetune.py --config config.yaml [OPTIONS]
 - **GPU**: 16GB+ VRAM
 - **RAM**: 32GB+ system RAM
 - **Storage**: SSD with 50GB+ free space
+
+### Serving Requirements
+- **GPU**: 8GB+ VRAM (for inference)
+- **RAM**: 8GB+ system RAM
+- **Network**: Stable internet connection for web interface
 
 ## Troubleshooting
 
@@ -326,14 +395,55 @@ Ensure your JSONL file follows the correct format:
 head -n 3 your_dataset.jsonl | python -m json.tool
 ```
 
+### Model Serving Issues
+
+If the Gradio interface fails to start:
+
+1. **Check model path**: Ensure the model path in `launch_model.py` is correct
+2. **GPU memory**: Make sure you have enough VRAM for inference
+3. **Port conflicts**: Try a different port if 7860 is occupied
+4. **Dependencies**: Ensure Gradio is installed: `pip install gradio>=4.0.0`
+
 ## Project Structure
 
 ```
 unsloth-pipeline/
 ├── config.yaml                 # Main configuration file
 ├── finetune.py                 # Training script
-├── requirements.txt            # Python dependencies
+├── launch_model.py             # Model serving script (NEW!)
+├── requirements.txt            # Python dependencies (updated)
 ├── devops-42k/                # Dataset processing example
 │   └── devops-42k.ipynb       # Data cleaning notebook
-└── README.md                  # Documentation
+└── README.md                  # Documentation (updated)
+```
+
+## Usage Examples
+
+### Complete Workflow
+
+```bash
+# 1. Install dependencies
+pip install -r requirements.txt
+
+# 2. Prepare your dataset (see devops-42k/ for example)
+python process_dataset.py
+
+# 3. Train the model
+python finetune.py --config config.yaml
+
+# 4. Serve the trained model
+python launch_model.py
+```
+
+### Quick Test
+
+```bash
+# Test configuration without training
+python finetune.py --config config.yaml --dry-run
+
+# Train with custom output directory
+python finetune.py --config config.yaml --output-dir ./my-model
+
+# Serve with specific model
+python launch_model.py  # Edit model path in script first
 ```

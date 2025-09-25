@@ -16,6 +16,9 @@ PyYAML>=6.0
 numpy>=1.24.0
 pandas>=2.0.0
 
+# Model Serving and Interface
+gradio>=4.0.0
+
 # Unsloth (install from git)
 # Run: pip install unsloth[colab-new] @ git+https://github.com/unslothai/unsloth.git
 
